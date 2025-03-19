@@ -103,3 +103,13 @@ if st.button("Salvar Relatório"):
             df_novo = pd.DataFrame(st.session_state.relatorio)
             df_novo.to_excel(db_arquivo, index=False)
             st.success(f"Relatório salvo como {db_arquivo}")
+
+# Botão para fazer download do arquivo
+with open('/mount/src/bi_informes/Joao Bassi_Relatorio_Entregas.xlsx', 'rb') as f:
+    st.download_button(
+        label="Baixar Relatório",
+        data=f,
+        file_name='Joao_Bassi_Relatorio_Entregas.xlsx',
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
