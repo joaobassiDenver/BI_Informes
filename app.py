@@ -86,7 +86,6 @@ if st.session_state.relatorio:
 # Se quiser salvar o arquivo Excel
 if st.button("Salvar Relatório"):
     if st.session_state.relatorio:
-        st.write(f"O arquivo foi salvo em: {os.path.abspath(db_arquivo)}")
 
         if os.path.exists(db_arquivo):
             # Se o arquivo já existe, carrega o arquivo existente
