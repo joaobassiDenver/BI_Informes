@@ -86,8 +86,9 @@ if st.session_state.relatorio:
 # Se quiser salvar o arquivo Excel
 if st.button("Salvar Relatório"):
     if st.session_state.relatorio:
-        # Verifica se o arquivo já existe
-        st.text(os.getcwd())
+        st.write(f"Diretório atual: {os.getcwd()}")
+        st.write(f"Diretório '/mount/src/bi_informes' existe: {os.path.exists('/mount/src/bi_informes')}")
+
         if os.path.exists(db_arquivo):
             # Se o arquivo já existe, carrega o arquivo existente
             df_existente = pd.read_excel(db_arquivo)
