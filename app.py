@@ -105,7 +105,7 @@ if st.button("Salvar Relatório"):
             st.success(f"Relatório salvo como {db_arquivo}")
 
 # Botão para fazer download do arquivo
-with open('/mount/src/bi_informes/Joao Bassi_Relatorio_Entregas.xlsx', 'rb') as f:
+with open(f'/mount/src/bi_informes/{db_arquivo}', 'rb') as f:
     st.download_button(
         label="Baixar Relatório",
         data=f,
