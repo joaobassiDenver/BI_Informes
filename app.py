@@ -87,7 +87,7 @@ if st.session_state.relatorio:
 if st.button("Salvar Relatório"):
     if st.session_state.relatorio:
         # Verifica se o arquivo já existe
-        print(os.get_cwd())
+        print(os.getcwd())
         if os.path.exists(db_arquivo):
             # Se o arquivo já existe, carrega o arquivo existente
             df_existente = pd.read_excel(db_arquivo)
