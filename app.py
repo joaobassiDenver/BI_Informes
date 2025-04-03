@@ -1,68 +1,56 @@
-import sqlite3
+import psycopg2
 import streamlit as st
 import pandas as pd
 from datetime import datetime
 import numpy as np
+from dotenv import load_dotenv
+import os
 
-def criarTables():
-    conn = sqlite3.connect('controleInformes.db')
+load_dotenv()
 
-    cursor = conn.cursor()
+USER = os.getenv("user")
+PASSWORD = os.getenv("password")
+HOST = os.getenv("host")
+PORT = os.getenv("port")
+DBNAME = os.getenv("dbname")
 
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS pessoasAtuando (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL UNIQUE
+def iniciarConexao():
+    try:
+        conn = psycopg2.connect(
+            user=USER,
+            password=PASSWORD,
+            host=HOST,
+            port=PORT,
+            dbname=DBNAME
         )
-    ''')
+        print("conn successful!")
+        
+    except Exception as e:
+        print(f"Failed to connect: {e}")
     
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS admCadastro (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL UNIQUE
-        )
-    ''')
-
-    # Criar a tabela registroFundos
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS registroFundos (
-            id INTEGER PRIMARY KEY,
-            userName TEXT NOT NULL,
-            startDate TEXT NOT NULL,
-            startTime TEXT NOT NULL,
-            finishTime TEXT NOT NULL,
-            fundoName TEXT NOT NULL,
-            adm TEXT NOT NULL,
-            obs TEXT
-        )
-    ''')
-
-    conn.commit()
-
-    conn.close()
+    return conn
 
 def registrarAtuantes(name):
     
-    conn = sqlite3.connect('controleInformes.db')
+    conn = iniciarConexao()
     cursor = conn.cursor()
 
-    cursor.execute("INSERT INTO pessoasAtuando (name) VALUES (?)", (name,))
-    
+    cursor.execute("INSERT INTO pessoasAtuando (name) VALUES (%s)", (name,))
     conn.commit()
     conn.close()
 
 def cadastrarADM(adm):
     
-    conn = sqlite3.connect('controleInformes.db')
+    conn = iniciarConexao()
     cursor = conn.cursor()
 
-    cursor.execute("INSERT INTO admCadastro (name) VALUES (?)", (adm,))
+    cursor.execute("INSERT INTO admCadastro (name) VALUES (%s)", (adm,))
     
     conn.commit()
     conn.close()
 
 def obterPessoasAtuantes():
-    conn = sqlite3.connect('controleInformes.db')
+    conn = iniciarConexao()
     cursor = conn.cursor()
     
     cursor.execute("SELECT * FROM pessoasAtuando")
@@ -73,7 +61,7 @@ def obterPessoasAtuantes():
     return pd.DataFrame(registros, columns=["ID", "Nome"])  # Colunas personalizadas de acordo com a tabela
 
 def obterAdmCadastrado():
-    conn = sqlite3.connect('controleInformes.db')
+    conn = iniciarConexao()
     cursor = conn.cursor()
     
     cursor.execute("SELECT * FROM admCadastro")
@@ -83,8 +71,8 @@ def obterAdmCadastrado():
     
     return pd.DataFrame(registros, columns=["ID", "ADM"])  # Colunas personalizadas de acordo com a tabela
 
-def excluir_registro(id):
-    conn = sqlite3.connect('controleInformes.db')  # Conectando ao banco de dados
+def excluir_registro(id):  # Conectando ao banco de dados
+    conn = iniciarConexao()
     cursor = conn.cursor()
     
     # Certificando-se de que o id é um número inteiro
@@ -95,13 +83,13 @@ def excluir_registro(id):
         return
     
     # SQL para excluir o registro com base no ID
-    cursor.execute("DELETE FROM pessoasAtuando WHERE id = ?", (id,))
+    cursor.execute("DELETE FROM pessoasAtuando WHERE id = %s", (id,))
     
     conn.commit()  # Confirma a transação
     conn.close()   # Fecha a conexão
 
 def obterDatas():
-    conn = sqlite3.connect('controleInformes.db')
+    conn = iniciarConexao()
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -115,11 +103,11 @@ def obterDatas():
     return np.unique(datas)
 
 def obterRegistroFundo(data=None, complete=False):
-    conn = sqlite3.connect('controleInformes.db')
+    conn = iniciarConexao()
     cursor = conn.cursor()
     
     if complete == False:
-        cursor.execute("SELECT * FROM registroFundos WHERE startDate = ?", (data,))
+        cursor.execute("SELECT * FROM registroFundos WHERE startDate = %s", (data,))
     else: 
         cursor.execute("SELECT * FROM registroFundos")
         
@@ -130,12 +118,12 @@ def obterRegistroFundo(data=None, complete=False):
     return pd.DataFrame(registrosDF, columns=["ID", "Responsável", "Data", "Hora Início", "Hora Término","Fundo", "Obs.", "Adm"])
 
 def registrarFundo(pessoaResponsavel, nomeFundo, adm, dataAtual, hora_inicio, hora_termino, obs):
-    conn = sqlite3.connect('controleInformes.db')
+    conn = iniciarConexao()
     cursor = conn.cursor()
     
     cursor.execute('''
         INSERT INTO registroFundos (userName, fundoName, adm, startDate, startTime, finishTime, obs)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     ''', (pessoaResponsavel, nomeFundo, adm, dataAtual, hora_inicio, hora_termino, obs))
     
     conn.commit()
