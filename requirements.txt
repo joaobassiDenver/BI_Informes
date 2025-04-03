@@ -1,4 +1,4 @@
 streamlit
 datetime
 openpyxl
-db-sqlite3
+psycopg2
