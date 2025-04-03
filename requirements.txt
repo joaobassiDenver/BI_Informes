@@ -1,4 +1,4 @@
 streamlit
 datetime
 openpyxl
-sqlite
+db-sqlite3
